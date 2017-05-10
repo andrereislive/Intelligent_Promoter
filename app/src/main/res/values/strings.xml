@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">Intelligent_Promoter</string>
+    <string name="app_name">SS - Intelligent Promoter</string>
+    <string name="title_activity_list_products">List of Products</string>
+    <string name="title_activity_product">Product</string>
 </resources>
