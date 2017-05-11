@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private EditText edtUrlImage;
     private ImageView ivShelf;
     private Button btnLoadShelf;
     private Button btnListProduct;
@@ -21,7 +20,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        edtUrlImage = (EditText) findViewById(R.id.edtUrlImage);
         ivShelf = (ImageView) findViewById(R.id.ivShelf);
         btnLoadShelf = (Button) findViewById(R.id.btnLoadShelf);
         btnListProduct = (Button) findViewById(R.id.btnProduct);
@@ -37,7 +35,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btnLoadShelf:
                 break;
             case R.id.ivShelf:
-                startActivity(new Intent(this, ListProductsActivity.class));
                 break;
             case R.id.btnProduct:
                 startActivity(new Intent(this, ListProductsActivity.class));
