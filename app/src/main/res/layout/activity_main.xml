@@ -10,17 +10,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.a1500fh.intelligent_promoter.MainActivity">
 
-    <EditText
-        android:id="@+id/edtUrlImage"
-        style="@android:style/Widget.DeviceDefault.Light.EditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="URL Image" />
-
     <Button
         android:id="@+id/btnLoadShelf"
         style="@android:style/Widget.DeviceDefault.Light.Button.Inset"
@@ -29,7 +18,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/edtUrlImage"
-        android:text="Load Shelf" />
+        android:text="SHELF IMAGE" />
 
     <Button
         android:id="@+id/btnProduct"
