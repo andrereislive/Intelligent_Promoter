@@ -15,10 +15,10 @@
         style="@android:style/Widget.DeviceDefault.Light.Button.Inset"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SHELF IMAGE"
-        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentTop="true"
+        android:text="SHELF IMAGE" />
 
     <Button
         android:id="@+id/btnProduct"
@@ -34,9 +34,11 @@
         android:id="@+id/ivShelf"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/btnProduct"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/btnLoadShelf"
-        app:srcCompat="@mipmap/ic_launcher"
-        android:layout_above="@+id/btnProduct"
-        android:layout_alignParentEnd="true" />
+        android:minHeight="300dp"
+        android:minWidth="300dp"
+        app:srcCompat="@mipmap/ic_launcher" />
 </RelativeLayout>
