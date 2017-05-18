@@ -2,5 +2,7 @@
     <string name="app_name">SS - Intelligent Promoter</string>
     <string name="title_activity_list_products">List of Products</string>
     <string name="title_activity_product">Product</string>
+    <string name="title_activity_shelf_share">ShelfShareActivity</string>
+    <string name="my_produtct">My Products</string>
 
 </resources>

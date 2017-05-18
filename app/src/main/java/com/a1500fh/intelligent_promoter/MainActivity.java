@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 launchCamera(v);
                 break;
             case R.id.ivShelf:
-
+                startActivity(new Intent(this, ShelfShareActivity.class));
                 break;
             case R.id.btnProduct:
                 startActivity(new Intent(this, ListProductsActivity.class));
@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * Lauch the camera
      */
     public void launchCamera(View view){
-        Log.i(TAG,"Lauch Camera()");
+        Log.i(TAG,"Launch Camera()");
 
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         //take pic and pass results to onActivityResults
