@@ -7,14 +7,6 @@
     tools:context="com.a1500fh.intelligent_promoter.ShelfShareActivity">
 
     <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="423dp"
-        android:layout_height="360dp"
-        app:srcCompat="@mipmap/ic_launcher"
-        tools:layout_editor_absoluteX="1dp"
-        tools:layout_editor_absoluteY="-1dp" />
-
-    <ImageView
         android:id="@+id/imageView2"
         android:layout_width="80dp"
         android:layout_height="57dp"
@@ -61,5 +53,15 @@
         android:layout_alignEnd="@+id/textView6"
         android:layout_below="@+id/textView6"
         android:text="Produto 03" />
+
+    <ImageView
+        android:id="@+id/ivRecognition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        app:srcCompat="@android:drawable/ic_delete"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@+id/imageView2" />
 
 </RelativeLayout>

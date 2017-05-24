@@ -3,6 +3,7 @@ package com.a1500fh.intelligent_promoter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 launchCamera(v);
                 break;
             case R.id.ivShelf:
+
                 startActivity(new Intent(this, ShelfShareActivity.class));
                 break;
             case R.id.btnProduct:
@@ -86,4 +88,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
     }
+
 }
