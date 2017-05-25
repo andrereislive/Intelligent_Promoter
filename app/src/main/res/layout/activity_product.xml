@@ -11,7 +11,7 @@
     tools:context="com.a1500fh.intelligent_promoter.ProductActivity">
 
     <EditText
-        android:id="@+id/ptProductName"
+        android:id="@+id/txtNome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
@@ -21,23 +21,14 @@
         android:inputType="textPersonName"
         android:text="Name" />
 
-    <ImageView
-        android:id="@+id/ivProduct"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/ptProductName"
-        app:srcCompat="@android:drawable/ic_menu_report_image"
-        android:layout_above="@+id/button" />
-
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btnSaveProdutct"
         style="@android:style/Widget.DeviceDefault.Light.Button.Inset"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
-        android:text="SAVE" />
+        android:layout_below="@+id/txtNome"
+        android:text="SAVE"
+        android:onClick="btn_click"/>
 </RelativeLayout>

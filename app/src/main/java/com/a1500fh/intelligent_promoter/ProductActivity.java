@@ -1,52 +1,63 @@
 package com.a1500fh.intelligent_promoter;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
-import android.provider.MediaStore;
+import android.database.sqlite.SQLiteException;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.a1500fh.controller.DBController;
+
+import static com.a1500fh.intelligent_promoter.Parameters.DBNAME;
+import static com.a1500fh.intelligent_promoter.Parameters.DBVERSION;
 
 public class ProductActivity extends AppCompatActivity implements View.OnClickListener {
+private static final String TAG = "ProductActivity";
 
-    private static final int SELECTED_PICTURE = 100;
-    private Uri imageUri;
+    private EditText txtNome;
+    DBController controllerDb;
 
-    private EditText ptName;
-    private ImageView ivProduct;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product);
 
-        ptName = (EditText) findViewById(R.id.ptProductName);
-        ivProduct = (ImageView) findViewById(R.id.ivProduct);
+        txtNome = (EditText) findViewById(R.id.txtNome);
 
-        ivProduct.setOnClickListener(this);
+        controllerDb = new DBController(this, DBNAME, null, DBVERSION);
+
     }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.ivProduct:
-                Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(i, SELECTED_PICTURE);
+    public void btn_click(View v) {
+        switch (v.getId()) {
+            case R.id.btnSaveProdutct:
+                inserirProduto();
+                startActivity(new Intent(ProductActivity.this, ListProductsActivity.class));
                 break;
         }
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        super.onActivityResult(requestCode,resultCode, data);
-        if(resultCode == RESULT_OK && requestCode == SELECTED_PICTURE)
-        {
-            imageUri = data.getData();
-            ivProduct.setImageURI(imageUri);
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btnSaveProdutct:
+                inserirProduto();
+                startActivity(new Intent(ProductActivity.this, ListProductsActivity.class));
+                break;
         }
     }
+
+    private void inserirProduto() {
+        try {
+            Log.i(TAG,"Inserindo");
+            controllerDb.insert_produto(txtNome.getText().toString());
+        } catch (SQLiteException ex) {
+            Toast.makeText(ProductActivity.this, "Already Exists", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
 }
