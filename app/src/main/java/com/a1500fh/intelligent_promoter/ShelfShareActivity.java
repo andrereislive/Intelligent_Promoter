@@ -1,39 +1,43 @@
 package com.a1500fh.intelligent_promoter;
 
+import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.util.Log;
 import android.widget.ImageView;
-import android.graphics.Canvas;
-import android.graphics.Bitmap;
-import android.graphics.Rect;
-import android.view.View;
 
 public class ShelfShareActivity extends AppCompatActivity {
+    private Bitmap cleanImage;
     private ImageView ivShelf;
     private static String TAG = "ShelfShareActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shelf_share);
 
         ivShelf = (ImageView) findViewById(R.id.ivRecognition);
-        // Calls the Rest WS
-        ObjectRecoginition imgObjRec = callRest();
+
+        Bitmap cleanImage = (Bitmap) getIntent().getParcelableExtra("clean_image");
+
+        ObjectRecoginition imgObjRec =  sendCleanImageToServer(cleanImage);
+
         ivShelf.setImageBitmap(imgObjRec.getProcessedImage());
 
 
-}
 
-    public ObjectRecoginition callRest(){
-        Log.i(TAG,"callRest()");
+    }
+    private ObjectRecoginition sendCleanImageToServer(Bitmap cleanImage){
         RestComm rest = new RestComm();
-        rest.execute("");
+        rest.executeSendImageToServer(cleanImage);
+        ObjectRecoginition objRec = new ObjectRecoginition(rest.getResponse());
+        return objRec;
+    }
 
-        Log.i(TAG,"RESPONSE=");
-        Log.i(TAG,rest.getResponse().toString());
+    private ObjectRecoginition askServerForTheProcessedImage() {
+
+        RestComm rest = new RestComm();
+        rest.executeAskImageFromServer();
         ObjectRecoginition objRec = new ObjectRecoginition(rest.getResponse());
 
         return objRec;

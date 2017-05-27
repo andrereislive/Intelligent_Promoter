@@ -3,6 +3,7 @@ package com.a1500fh.intelligent_promoter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,12 +30,14 @@ import java.util.logging.Logger;
  *
  */
 public class ObjectRecoginition {
-
+    private static final String TAG = " ObjectRecoginition";
     private List<RecognizedObjects> recognizedObjectsList = new ArrayList<>();
     private Bitmap processedImage;
     private Bitmap cleanImage;
 
+    public ObjectRecoginition(){
 
+    }
     public ObjectRecoginition(StringBuilder myJsonString) {
 
         try {
@@ -46,7 +49,7 @@ public class ObjectRecoginition {
             String clean = jsono.get("clean_image").toString();
 
             processedImage =  string64toBitmap(processed);
-            cleanImage = string64toBitmap(clean);
+            setCleanImage(string64toBitmap(clean));
 
             // get the JSONObject named "menu" from the root JSONObject
             JSONArray jArray = jsono.getJSONArray("recognized_objects");
@@ -63,7 +66,7 @@ public class ObjectRecoginition {
 
 
 
-    private Bitmap string64toBitmap(String base64Str) throws IllegalArgumentException
+    public Bitmap string64toBitmap(String base64Str) throws IllegalArgumentException
     {
         byte[] decodedBytes = Base64.decode(
                 base64Str.substring(base64Str.indexOf(",")  + 1),
@@ -72,12 +75,12 @@ public class ObjectRecoginition {
 
         return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
     }
-    private String bitmapToString64(Bitmap bitmap)
+    public String bitmapToString64(Bitmap bitmap)
     {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
 
-        return Base64.encodeToString(outputStream.toByteArray(), Base64.DEFAULT);
+        return Base64.encodeToString(outputStream.toByteArray(), Base64.DEFAULT).replace("\n", "");
     }
 
     public String getArrays() {
@@ -98,6 +101,22 @@ public class ObjectRecoginition {
     public Bitmap getCleanImage() {
         return cleanImage;
     }
+
+
+
+    public void setCleanImage(Bitmap cleanImage) {
+        this.cleanImage = cleanImage;
+    }
+
+    public String getCleanImageJson() {
+       String encodedImage = bitmapToString64(cleanImage);
+
+        String myJson ="{\"clean_image\":\"" +encodedImage+"\"}";
+
+
+        return myJson;
+    }
+
 
 
     public class RecognizedObjects {
