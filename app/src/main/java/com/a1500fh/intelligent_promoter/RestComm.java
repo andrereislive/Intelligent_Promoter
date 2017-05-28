@@ -1,8 +1,10 @@
 package com.a1500fh.intelligent_promoter;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,12 +22,8 @@ import okhttp3.*;
 public class RestComm extends AsyncTask {
     private static final String TAG = "RestComm";
 
-
     public static final int SEND_IMAGE_TO_SERVER = 0;
     public static final String URL_SEND_IMAGE_TO_SERVER = "http://192.168.5.104:8000/intelligent_promoter/image/";
-
-    public static final int ASK_PROCESSED_IMAGE = 1;
-    public static final String URL_ASK_PROCESSED_IMAGE = "http://192.168.5.104:8000/intelligent_promoter/image/";
 
     private static final int CONNECTION_TIMEOUT_SEC = 60; // tempo de vida da conexao
     private static final int WRITE_TIMEOUT_SEC = 60;
@@ -34,46 +32,26 @@ public class RestComm extends AsyncTask {
 
     StringBuilder restResponse;
 
-  OkHttpClient client = new OkHttpClient.Builder()
+    OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(CONNECTION_TIMEOUT_SEC, TimeUnit.SECONDS)
-                .writeTimeout(WRITE_TIMEOUT_SEC, TimeUnit.SECONDS)
-                .readTimeout(READ_TIMEOUT_SEC, TimeUnit.SECONDS)
-                .build();
+            .writeTimeout(WRITE_TIMEOUT_SEC, TimeUnit.SECONDS)
+            .readTimeout(READ_TIMEOUT_SEC, TimeUnit.SECONDS)
+            .build();
+
     private Bitmap cleanImage;
-    /**
-     * @param args the command line arguments
-     */
 
+public RestComm(){
 
-    /**
-     * Exemplo
-     * StringBuilder strBuilder = askServerForTheProcessedImage();
-     * ObjectRecoginition objRec = new ObjectRecoginition(strBuilder);
-     * <p>
-     * System.out.println(objRec.getRecognizedObjectsList().get(0).getLabel());
-     * System.out.println(objRec.getRecognizedObjectsList().get(0).getBottom());
-     */
-
-    public StringBuilder callRest() {
-
-        return null;
-    }
+}
 
     @Override
     protected Object doInBackground(Object[] params) {
-
         if ((int) (params[0]) == RestComm.SEND_IMAGE_TO_SERVER) {
 
             ObjectRecoginition objRec = new ObjectRecoginition();
             objRec.setCleanImage((Bitmap) params[1]);
             sendImageToServer(objRec.getCleanImageJson());
         }
-
-        if ((int) (params[0]) == RestComm.ASK_PROCESSED_IMAGE) {
-            askImageFromServer();
-        }
-
-
         return null;
     }
 
@@ -99,19 +77,6 @@ public class RestComm extends AsyncTask {
 
     }
 
-    private void askImageFromServer() {
-        Request request = new Request.Builder()
-                .url(URL_ASK_PROCESSED_IMAGE)
-                .build();
-        try {
-
-            Response response = client.newCall(request).execute();
-            restResponse = new StringBuilder(response.body().string());
-
-        } catch (IOException ex) {
-            Logger.getLogger(RestComm.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
 
     public void executeSendImageToServer(Bitmap image) {
 
@@ -120,22 +85,14 @@ public class RestComm extends AsyncTask {
 
     }
 
-    public void executeAskImageFromServer() {
-        Object[] obj = new Object[]{ASK_PROCESSED_IMAGE};
-        this.execute(obj);
-
-    }
 
     public StringBuilder getResponse() {
-        int i = 0;
-        int iterationsMax = CONNECTION_TIMEOUT_SEC;
+        int i = CONNECTION_TIMEOUT_SEC;
         // espera um tempo pra processar o rest no doInbackground
-        while (restResponse == null && i < iterationsMax) {
-
-            i++;
-            Log.i(TAG, "Loop getResponse:" + i);
-
+        while (restResponse == null && i > 0) {
+            i--;
             sleep(1000);
+
         }
         return restResponse;
     }

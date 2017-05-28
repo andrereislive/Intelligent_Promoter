@@ -14,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,13 +22,12 @@ import java.util.logging.Logger;
 /**
  * This example uses the org.json.me parser provided by json.org to parse and
  * browse a JSON content.
- *
+ * <p>
  * The JSON content is simple abstraction of a file menu as provided here:
  * http://www.json.org/example.html
- *
+ * <p>
  * The example then tries to list all the 'menuitem's available in the popup
  * menu. It is assumed the user knows the menu JSON file structure.
- *
  */
 public class ObjectRecoginition {
     private static final String TAG = " ObjectRecoginition";
@@ -35,9 +35,10 @@ public class ObjectRecoginition {
     private Bitmap processedImage;
     private Bitmap cleanImage;
 
-    public ObjectRecoginition(){
+    public ObjectRecoginition() {
 
     }
+
     public ObjectRecoginition(StringBuilder myJsonString) {
 
         try {
@@ -48,7 +49,7 @@ public class ObjectRecoginition {
             String processed = jsono.get("processed_image").toString();
             String clean = jsono.get("clean_image").toString();
 
-            processedImage =  string64toBitmap(processed);
+            processedImage = string64toBitmap(processed);
             setCleanImage(string64toBitmap(clean));
 
             // get the JSONObject named "menu" from the root JSONObject
@@ -64,19 +65,16 @@ public class ObjectRecoginition {
     }
 
 
-
-
-    public Bitmap string64toBitmap(String base64Str) throws IllegalArgumentException
-    {
+    public Bitmap string64toBitmap(String base64Str) throws IllegalArgumentException {
         byte[] decodedBytes = Base64.decode(
-                base64Str.substring(base64Str.indexOf(",")  + 1),
+                base64Str.substring(base64Str.indexOf(",") + 1),
                 Base64.DEFAULT
         );
 
         return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
     }
-    public String bitmapToString64(Bitmap bitmap)
-    {
+
+    public String bitmapToString64(Bitmap bitmap) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
 
@@ -103,20 +101,21 @@ public class ObjectRecoginition {
     }
 
 
-
     public void setCleanImage(Bitmap cleanImage) {
         this.cleanImage = cleanImage;
     }
 
     public String getCleanImageJson() {
-       String encodedImage = bitmapToString64(cleanImage);
+        String encodedImage = bitmapToString64(cleanImage);
 
-        String myJson ="{\"clean_image\":\"" +encodedImage+"\"}";
+        String imageUuidName = UUID.randomUUID().toString();
+
+
+        String myJson = "{\"clean_image\":\"" + encodedImage + "\",\"clean_image_uuid_name\":\"" + imageUuidName + "\"}";
 
 
         return myJson;
     }
-
 
 
     public class RecognizedObjects {
@@ -147,7 +146,7 @@ public class ObjectRecoginition {
                 label = jObject.getString(strLabel);
                 nms = jObject.getBoolean(strNms);
                 score = new BigDecimal(jObject.getString(strScore));
-               // shelfShare = new BigDecimal(jObject.getString(strShelfShare));
+                // shelfShare = new BigDecimal(jObject.getString(strShelfShare));
                 left = jObject.getInt(strLeft);
                 top = jObject.getInt(strTop);
                 right = jObject.getInt(strRight);

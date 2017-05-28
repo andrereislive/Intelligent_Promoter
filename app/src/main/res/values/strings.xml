@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SS - Intelligent Promoter</string>
+    <string name="app_name">Intelligent Promoter</string>
     <string name="title_activity_list_products">List of Products</string>
     <string name="title_activity_product">Product</string>
     <string name="title_activity_shelf_share">ShelfShareActivity</string>

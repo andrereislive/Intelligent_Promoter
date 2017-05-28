@@ -1,14 +1,23 @@
 package com.a1500fh.intelligent_promoter;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.a1500fh.utils.ImageCapture;
+
+import java.io.File;
 
 public class ShelfShareActivity extends AppCompatActivity {
     private Bitmap cleanImage;
     private ImageView ivShelf;
+
     private static String TAG = "ShelfShareActivity";
 
     @Override
@@ -18,92 +27,41 @@ public class ShelfShareActivity extends AppCompatActivity {
 
         ivShelf = (ImageView) findViewById(R.id.ivRecognition);
 
-        Bitmap cleanImage = (Bitmap) getIntent().getParcelableExtra("clean_image");
+        // pega a imagem salva na tela anterior, ela esta em um arquivo
+        // se a imagem fosse passada por parametro, o processamento entre enviar a img de uma tela
+        // pra outra  é muito maior, e a app trava
+        String imageSource = getIntent().getStringExtra("image_source");
+        cleanImage = loadImageTaken(imageSource);
 
-        ObjectRecoginition imgObjRec =  sendCleanImageToServer(cleanImage);
+        // Envia a imagem para o servidor
+        // servidor retorna a imagem processada
+        ObjectRecoginition imgObjRec = sendCleanImageToServer(cleanImage);
 
-        ivShelf.setImageBitmap(imgObjRec.getProcessedImage());
-
-
-
+        if (imgObjRec.getProcessedImage() != null)
+            ivShelf.setImageBitmap(imgObjRec.getProcessedImage());
     }
-    private ObjectRecoginition sendCleanImageToServer(Bitmap cleanImage){
+
+    private Bitmap loadImageTaken(String imageSource) {
+        File file;
+        Bitmap bitmap = null;
+        File fileCheck = new File(imageSource);
+        if (fileCheck.exists()) {
+            bitmap = ImageCapture.rotateBitmapOrientation(imageSource);
+        } else {
+            Toast toast = Toast.makeText(this, "Image not found!", Toast.LENGTH_SHORT);
+        }
+        return bitmap;
+    }
+
+    /**
+     * Recebe um Bitmap envia para o servidor e o servidor retorna um json contendo algumas informacoes e mais a imagem processada,
+     * todos esses dados são serializados no ObjectRecognition que podera ser usado mais afrente
+     */
+    private ObjectRecoginition sendCleanImageToServer(Bitmap cleanImage) {
         RestComm rest = new RestComm();
         rest.executeSendImageToServer(cleanImage);
         ObjectRecoginition objRec = new ObjectRecoginition(rest.getResponse());
         return objRec;
     }
 
-    private ObjectRecoginition askServerForTheProcessedImage() {
-
-        RestComm rest = new RestComm();
-        rest.executeAskImageFromServer();
-        ObjectRecoginition objRec = new ObjectRecoginition(rest.getResponse());
-
-        return objRec;
-    }
 }
-
-//ivShelf.setOnClickListener(new View.OnClickListener() {
-//        @Override
-//        public void onClick(View view) {
-//            Bitmap bitmap = Bitmap.createBitmap(
-//                    ivShelf.getWidth() , // Width
-//                    ivShelf.getHeight(), // Height
-//                    Bitmap.Config.ARGB_8888 // Config
-//            );
-//
-//            // Initialize a new Canvas instance
-//            Canvas canvas = new Canvas(bitmap);
-//
-//            // Draw a solid color to the canvas background
-//
-//
-//            // Initialize a new Paint instance to draw the Rectangle
-//            Paint paint = new Paint();
-//            paint.setStyle(Paint.Style.STROKE);
-//            paint.setColor(Color.GREEN);
-//            paint.setAntiAlias(true);
-//
-//            // Set a pixels value to padding around the rectangle
-//            int padding = 50;
-//
-//                /*
-//                    public Rect (int left, int top, int right, int bottom)
-//                        Create a new rectangle with the specified coordinates. Note: no range
-//                        checking is performed, so the caller must ensure that left <= right and
-//                        top <= bottom.
-//
-//                    Parameters
-//                        left : The X coordinate of the left side of the rectangle
-//                        top : The Y coordinate of the top of the rectangle
-//                        right : The X coordinate of the right side of the rectangle
-//                        bottom : The Y coordinate of the bottom of the rectangle
-//
-//                */
-//
-//            // Initialize a new Rect object
-//            Rect rectangle = new Rect(
-//                    padding, // Left
-//                    padding, // Top
-//                    canvas.getWidth() - padding, // Right
-//                    canvas.getHeight() - padding // Bottom
-//            );
-//
-//                /*
-//                    public void drawRect (Rect r, Paint paint)
-//                        Draw the specified Rect using the specified Paint. The rectangle will be
-//                        filled or framed based on the Style in the paint.
-//
-//                    Parameters
-//                        r : The rectangle to be drawn.
-//                        paint : The paint used to draw the rectangle
-//                */
-//
-//            // Finally, draw the rectangle on the canvas
-//            canvas.drawRect(rectangle, paint);
-//
-//            // Display the newly created bitmap on app interface
-//            ivShelf.setImageBitmap(bitmap);
-//        }
-//    });
