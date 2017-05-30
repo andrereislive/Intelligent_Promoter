@@ -25,6 +25,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -45,8 +46,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String imgPath = IMG_PATH_CAMERA; // caminho da imagem escolhida
 
     private ImageView ivShelf;
-    private Button btnLoadShelf;
-    private Button btnListProduct;
+    private ImageButton btnLoadShelf;
+    private ImageButton btnListProduct;
     private Bitmap chosenImage;
 
 
@@ -65,13 +66,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         ivShelf = (ImageView) findViewById(R.id.ivShelf);
 
-        btnLoadShelf = (Button) findViewById(R.id.btnLoadCamera);
-        btnListProduct = (Button) findViewById(R.id.btnLoad);
+        btnLoadShelf = (ImageButton) findViewById(R.id.btnCamera);
+        btnListProduct = (ImageButton) findViewById(R.id.btnLoad);
 
         btnLoadShelf.setOnClickListener(this);
         ivShelf.setOnClickListener(this);
         btnListProduct.setOnClickListener(this);
-        
+
 
         // Desebilita camera se dispositivo nao tiver
         if (!hasCamera())
@@ -92,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (chosenImage != null)
                     zoom.zoomImageFromThumb(ivShelf, chosenImage, (ImageView) findViewById(R.id.expanded_image), R.id.container, this);
                 break;
-            case R.id.btnLoadCamera:
+            case R.id.btnCamera:
                 selectImage();
                 break;
 
