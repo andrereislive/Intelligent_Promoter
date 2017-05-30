@@ -1,5 +1,6 @@
 package com.a1500fh.intelligent_promoter;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -7,12 +8,14 @@ import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.a1500fh.utils.ImageCapture;
+import com.a1500fh.utils.ZoomImageThumb;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -22,6 +25,8 @@ public class ShelfShareActivity extends AppCompatActivity {
     private Bitmap cleanImage;
     private ImageView ivShelf;
     private ListView lvShare;
+    ZoomImageThumb zoom = new ZoomImageThumb();
+    ObjectRecoginition imgObjRec;
 
     private static String TAG = "ShelfShareActivity";
 
@@ -41,15 +46,15 @@ public class ShelfShareActivity extends AppCompatActivity {
 
         // Envia a imagem para o servidor
         // servidor retorna a imagem processada
-        ObjectRecoginition imgObjRec = sendCleanImageToServer(cleanImage);
+        imgObjRec = sendCleanImageToServer(cleanImage);
         if (imageSource != null) {
             List<String> shareList = new ArrayList<>();
-             shareList = imgObjRec.getShelfShareObjects();
+            shareList = imgObjRec.getShelfShareObjects();
 
             ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
                     this,
                     android.R.layout.simple_list_item_1,
-                    shareList );
+                    shareList);
 
             lvShare.setAdapter(arrayAdapter);
 
@@ -59,6 +64,15 @@ public class ShelfShareActivity extends AppCompatActivity {
         }
 
 
+    }
+
+    public void btnIvClick(View v) {
+        switch (v.getId()) {
+            case R.id.ivRecognition:
+                if (imgObjRec != null && imgObjRec.getProcessedImage() != null)
+                    zoom.zoomImageFromThumb(ivShelf, imgObjRec.getProcessedImage(), (ImageView) findViewById(R.id.expanded_image_share), R.id.container_share, this);
+                break;
+        }
     }
 
     private Bitmap loadImageTaken(String imageSource) {
@@ -83,5 +97,6 @@ public class ShelfShareActivity extends AppCompatActivity {
         ObjectRecoginition objRec = new ObjectRecoginition(rest.getResponse());
         return objRec;
     }
+
 
 }

@@ -29,6 +29,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.a1500fh.utils.ImageCapture;
+import com.a1500fh.utils.ZoomImageThumb;
 
 import java.io.File;
 
@@ -54,7 +55,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Animator mCurrentAnimatorEffect;
     private int mShortAnimationDurationEffect;
-
+    ZoomImageThumb zoom = new ZoomImageThumb();
+// <<<<<<<<<<<<<<<<<<<<< PaREI Aki  <<<<<<<<<<<<<<<<<
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.ivShelf:
                 if (chosenImage != null)
-                    zoomImageFromThumb(ivShelf, chosenImage);
+                    zoom.zoomImageFromThumb(ivShelf, chosenImage, (ImageView) findViewById(R.id.expanded_image), R.id.container,this);
                 break;
             case R.id.btnLoadCamera:
                 selectImage();
