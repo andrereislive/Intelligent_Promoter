@@ -7,16 +7,21 @@ import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.a1500fh.utils.ImageCapture;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ShelfShareActivity extends AppCompatActivity {
     private Bitmap cleanImage;
     private ImageView ivShelf;
+    private ListView lvShare;
 
     private static String TAG = "ShelfShareActivity";
 
@@ -26,6 +31,7 @@ public class ShelfShareActivity extends AppCompatActivity {
         setContentView(R.layout.activity_shelf_share);
 
         ivShelf = (ImageView) findViewById(R.id.ivRecognition);
+        lvShare = (ListView) findViewById(R.id.lvShare);
 
         // pega a imagem salva na tela anterior, ela esta em um arquivo
         // se a imagem fosse passada por parametro, o processamento entre enviar a img de uma tela
@@ -36,9 +42,23 @@ public class ShelfShareActivity extends AppCompatActivity {
         // Envia a imagem para o servidor
         // servidor retorna a imagem processada
         ObjectRecoginition imgObjRec = sendCleanImageToServer(cleanImage);
+        if (imageSource != null) {
+            List<String> shareList = new ArrayList<>();
+             shareList = imgObjRec.getShelfShareObjects();
 
-        if (imgObjRec.getProcessedImage() != null)
-            ivShelf.setImageBitmap(imgObjRec.getProcessedImage());
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
+                    this,
+                    android.R.layout.simple_list_item_1,
+                    shareList );
+
+            lvShare.setAdapter(arrayAdapter);
+
+            if (imgObjRec.getProcessedImage() != null) {
+                ivShelf.setImageBitmap(imgObjRec.getProcessedImage());
+            }
+        }
+
+
     }
 
     private Bitmap loadImageTaken(String imageSource) {

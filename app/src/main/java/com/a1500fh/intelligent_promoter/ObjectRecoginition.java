@@ -3,7 +3,6 @@ package com.a1500fh.intelligent_promoter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,7 +30,18 @@ import java.util.logging.Logger;
  */
 public class ObjectRecoginition {
     private static final String TAG = " ObjectRecoginition";
+
+    private static final String strRecognizedObjectsArray = "recognized_objects";
+    private static final String strShelfShareArray = "shelf_share_objects";
+
+    private static final String strCleanImage= "clean_image";
+    private static final String strProcessedImage= "processed_image";
+    private static final String strCleanImageUuidName= "clean_image_uuid_name";
+
+
     private List<RecognizedObjects> recognizedObjectsList = new ArrayList<>();
+    private List<ShelfShare> shelfShareList = new ArrayList<>();
+
     private Bitmap processedImage;
     private Bitmap cleanImage;
 
@@ -46,17 +56,23 @@ public class ObjectRecoginition {
             // create the data structure to exploit the content
             // the string is created assuming default encoding
             JSONObject jsono = new JSONObject(myJsonString.toString());
-            String processed = jsono.get("processed_image").toString();
-            String clean = jsono.get("clean_image").toString();
+            String processed = jsono.get(strProcessedImage).toString();
+            String clean = jsono.get(strCleanImage).toString();
 
             processedImage = string64toBitmap(processed);
             setCleanImage(string64toBitmap(clean));
 
-            // get the JSONObject named "menu" from the root JSONObject
-            JSONArray jArray = jsono.getJSONArray("recognized_objects");
-            for (int x = 0; x < jArray.length(); x++) {
-                recognizedObjectsList.add(new RecognizedObjects(jArray.getJSONObject(x)));
+
+            JSONArray jArrayRecognizedObjects = jsono.getJSONArray(strRecognizedObjectsArray);
+            for (int x = 0; x < jArrayRecognizedObjects.length(); x++) {
+                recognizedObjectsList.add(new RecognizedObjects(jArrayRecognizedObjects.getJSONObject(x)));
             }
+
+            JSONArray jArrayShare = jsono.getJSONArray(strShelfShareArray);
+            for (int x = 0; x < jArrayShare.length(); x++) {
+                shelfShareList.add(new ShelfShare(jArrayShare.getJSONObject(x)));
+            }
+
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -111,12 +127,54 @@ public class ObjectRecoginition {
         String imageUuidName = UUID.randomUUID().toString();
 
 
-        String myJson = "{\"clean_image\":\"" + encodedImage + "\",\"clean_image_uuid_name\":\"" + imageUuidName + "\"}";
+        String myJson = "{\""+ strCleanImage+"\":\"" + encodedImage + "\",\""+strCleanImageUuidName+"\":\"" + imageUuidName + "\"}";
 
 
         return myJson;
     }
 
+    public List<String> getShelfShareObjects() {
+        List<String> shareList = new ArrayList<>();
+        for(ShelfShare it : shelfShareList) {
+            String share = it.getSharePercentage().setScale(2, BigDecimal.ROUND_HALF_UP).toString();
+            shareList.add(share +"% / " + it.getProduct());
+
+        }
+        return shareList;
+    }
+
+    public class ShelfShare {
+        private BigDecimal sharePercentage;
+        private String product;
+
+        private String strSharePercentage = "share_percentage";
+        private String strProduct = "product";
+
+        public ShelfShare(JSONObject jObject) {
+            try {
+                sharePercentage = new BigDecimal(jObject.getString(strSharePercentage));
+                product = jObject.getString(strProduct);
+            } catch (JSONException ex) {
+                Logger.getLogger(ObjectRecoginition.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        public BigDecimal getSharePercentage() {
+            return sharePercentage;
+        }
+
+        public void setSharePercentage(BigDecimal sharePercentage) {
+            this.sharePercentage = sharePercentage;
+        }
+
+        public String getProduct() {
+            return product;
+        }
+
+        public void setProduct(String product) {
+            this.product = product;
+        }
+    }
 
     public class RecognizedObjects {
 
