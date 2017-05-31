@@ -16,31 +16,48 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginEnd="42dp"
-        android:text="Share / Product"
-        android:textSize="18sp"
+        android:background="@color/colorShare"
+        android:gravity="center|right"
+        android:text="Shelf Share "
+        android:textAlignment="gravity"
+        android:textColor="@color/colorBlack"
+
+
+        android:textSize="26sp"
         tools:layout_editor_absoluteX="497dp"
         tools:layout_editor_absoluteY="72dp" />
-
-    <ImageView
-        android:id="@+id/ivRecognition"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        app:srcCompat="@android:drawable/ic_delete"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentTop="true"
-        android:layout_toStartOf="@+id/textView"
-        android:onClick="btnIvClick"/>
-
-    <ListView
-        android:id="@+id/lvShare"
+    <LinearLayout
+        android:orientation="horizontal"
+        android:id="@+id/rel_lay"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentEnd="true"
-        android:layout_alignStart="@+id/textView"
-        android:layout_below="@+id/textView" />
+        android:layout_height="wrap_content"
+
+        android:layout_alignParentBottom="false"
+
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textView">
+        <ImageView
+            android:id="@+id/ivRecognition"
+            android:layout_width="239dp"
+            android:layout_height="match_parent"
+
+            app:srcCompat="@android:drawable/ic_delete"
+                android:paddingLeft="10pt"
+            android:onClick="btnIvClick"
+
+            />
+
+        <ListView
+            android:id="@+id/lvShare"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+
+
+           />
+    </LinearLayout>
+
 
 </RelativeLayout>
     <ImageView

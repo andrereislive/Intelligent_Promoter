@@ -10,6 +10,7 @@
 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorWhite"
     tools:context="com.a1500fh.intelligent_promoter.MainActivity">
 
     <ImageView
@@ -22,7 +23,7 @@
 
         android:minHeight="300dp"
         android:minWidth="300dp"
-        app:srcCompat="@android:drawable/ic_dialog_dialer" />
+        app:srcCompat="@drawable/fundo" />
 
     <ImageButton
         android:id="@+id/btnCamera"
@@ -36,6 +37,7 @@
         android:background="@android:color/transparent"/>
 
     <ImageButton
+
         android:id="@+id/btnLoad"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

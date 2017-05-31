@@ -23,7 +23,7 @@ public class RestComm extends AsyncTask {
     private static final String TAG = "RestComm";
 
     public static final int SEND_IMAGE_TO_SERVER = 0;
-    public static final String URL_SEND_IMAGE_TO_SERVER = "http://192.168.0.104:8000/intelligent_promoter/image/";
+    public static final String URL_SEND_IMAGE_TO_SERVER = "http://192.168.5.101:8000/intelligent_promoter/image/";
 
     private static final int CONNECTION_TIMEOUT_SEC = 60; // tempo de vida da conexao
     private static final int WRITE_TIMEOUT_SEC = 60;
