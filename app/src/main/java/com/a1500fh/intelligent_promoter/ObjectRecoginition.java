@@ -34,9 +34,9 @@ public class ObjectRecoginition {
     private static final String strRecognizedObjectsArray = "recognized_objects";
     private static final String strShelfShareArray = "shelf_share_objects";
 
-    private static final String strCleanImage= "clean_image";
-    private static final String strProcessedImage= "processed_image";
-    private static final String strCleanImageUuidName= "clean_image_uuid_name";
+    private static final String strCleanImage = "clean_image";
+    private static final String strProcessedImage = "processed_image";
+    private static final String strCleanImageUuidName = "clean_image_uuid_name";
 
 
     private List<RecognizedObjects> recognizedObjectsList = new ArrayList<>();
@@ -52,28 +52,28 @@ public class ObjectRecoginition {
     public ObjectRecoginition(StringBuilder myJsonString) {
 
         try {
+            if (myJsonString != null) {
+                // create the data structure to exploit the content
+                // the string is created assuming default encoding
+                JSONObject jsono = new JSONObject(myJsonString.toString());
+                String processed = jsono.get(strProcessedImage).toString();
+                String clean = jsono.get(strCleanImage).toString();
 
-            // create the data structure to exploit the content
-            // the string is created assuming default encoding
-            JSONObject jsono = new JSONObject(myJsonString.toString());
-            String processed = jsono.get(strProcessedImage).toString();
-            String clean = jsono.get(strCleanImage).toString();
-
-            processedImage = string64toBitmap(processed);
-            setCleanImage(string64toBitmap(clean));
+                processedImage = string64toBitmap(processed);
+                setCleanImage(string64toBitmap(clean));
 
 
-            JSONArray jArrayRecognizedObjects = jsono.getJSONArray(strRecognizedObjectsArray);
-            for (int x = 0; x < jArrayRecognizedObjects.length(); x++) {
-                recognizedObjectsList.add(new RecognizedObjects(jArrayRecognizedObjects.getJSONObject(x)));
+                JSONArray jArrayRecognizedObjects = jsono.getJSONArray(strRecognizedObjectsArray);
+                for (int x = 0; x < jArrayRecognizedObjects.length(); x++) {
+                    recognizedObjectsList.add(new RecognizedObjects(jArrayRecognizedObjects.getJSONObject(x)));
+                }
+
+                JSONArray jArrayShare = jsono.getJSONArray(strShelfShareArray);
+                for (int x = 0; x < jArrayShare.length(); x++) {
+                    shelfShareList.add(new ShelfShare(jArrayShare.getJSONObject(x)));
+                }
+
             }
-
-            JSONArray jArrayShare = jsono.getJSONArray(strShelfShareArray);
-            for (int x = 0; x < jArrayShare.length(); x++) {
-                shelfShareList.add(new ShelfShare(jArrayShare.getJSONObject(x)));
-            }
-
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -127,7 +127,7 @@ public class ObjectRecoginition {
         String imageUuidName = UUID.randomUUID().toString();
 
 
-        String myJson = "{\""+ strCleanImage+"\":\"" + encodedImage + "\",\""+strCleanImageUuidName+"\":\"" + imageUuidName + "\"}";
+        String myJson = "{\"" + strCleanImage + "\":\"" + encodedImage + "\",\"" + strCleanImageUuidName + "\":\"" + imageUuidName + "\"}";
 
 
         return myJson;
@@ -135,9 +135,9 @@ public class ObjectRecoginition {
 
     public List<String> getShelfShareObjects() {
         List<String> shareList = new ArrayList<>();
-        for(ShelfShare it : shelfShareList) {
+        for (ShelfShare it : shelfShareList) {
             String share = it.getSharePercentage().setScale(2, BigDecimal.ROUND_HALF_UP).toString();
-            shareList.add(share +"% / " + it.getProduct());
+            shareList.add(share + "% / " + it.getProduct());
 
         }
         return shareList;

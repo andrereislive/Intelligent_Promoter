@@ -55,9 +55,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int RESULT_LOAD_IMG = 1;
 
     ZoomImageThumb zoom = new ZoomImageThumb();
+// ############ Parei akii ############################
+    // ##################################################
 
-    // <<<<<<<<<<<<<<<<<<<<< PaREI Aki  <<<<<<<<<<<<<<<<<
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void selectImage() {
-        final CharSequence[] items = {"Take Photo", "Choose from Library",
+        final CharSequence[] items = {"Camera", "Gallery",
                 "Cancel"};
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Add Photo!");
@@ -137,9 +137,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(DialogInterface dialog, int item) {
 
-                if (items[item].equals("Take Photo")) {
+                if (items[item].equals("Camera")) {
                     launchCameraFullRes();
-                } else if (items[item].equals("Choose from Library")) {
+                } else if (items[item].equals("Gallery")) {
                     galleryIntent();
                 } else if (items[item].equals("Cancel")) {
                     dialog.dismiss();

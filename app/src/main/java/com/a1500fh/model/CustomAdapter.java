@@ -22,6 +22,7 @@ public class CustomAdapter extends ArrayAdapter<Produto> implements View.OnClick
 
     private List<Produto> dataSet;
     Context mContext;
+    private int lastPosition = -1;
 
     // View lookup cache
     private static class ViewHolder {
@@ -62,7 +63,6 @@ public class CustomAdapter extends ArrayAdapter<Produto> implements View.OnClick
 
     }
 
-    private int lastPosition = -1;
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {

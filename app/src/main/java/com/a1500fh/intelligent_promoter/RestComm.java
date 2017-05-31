@@ -23,11 +23,13 @@ public class RestComm extends AsyncTask {
     private static final String TAG = "RestComm";
 
     public static final int SEND_IMAGE_TO_SERVER = 0;
-    public static final String URL_SEND_IMAGE_TO_SERVER = "http://192.168.5.101:8000/intelligent_promoter/image/";
+    public static final String URL_SEND_IMAGE_TO_SERVER = "http://192.168.0.104:8000/intelligent_promoter/image/";
 
-    private static final int CONNECTION_TIMEOUT_SEC = 60; // tempo de vida da conexao
-    private static final int WRITE_TIMEOUT_SEC = 60;
-    private static final int READ_TIMEOUT_SEC = 60; // tempo de vida do socket
+    public static final int CONNECTION_LIFE = 60;
+
+    private static final int CONNECTION_TIMEOUT_SEC = CONNECTION_LIFE; // tempo de vida da conexao
+    private static final int WRITE_TIMEOUT_SEC = CONNECTION_LIFE;
+    private static final int READ_TIMEOUT_SEC = CONNECTION_LIFE; // tempo de vida do socket
 
 
     StringBuilder restResponse;
@@ -38,11 +40,10 @@ public class RestComm extends AsyncTask {
             .readTimeout(READ_TIMEOUT_SEC, TimeUnit.SECONDS)
             .build();
 
-    private Bitmap cleanImage;
 
-public RestComm(){
+    public RestComm() {
 
-}
+    }
 
     @Override
     protected Object doInBackground(Object[] params) {
@@ -70,9 +71,11 @@ public RestComm(){
                 .build();
         try {
             Response response = client.newCall(request).execute();
-            restResponse = new StringBuilder(response.body().string());
+            if (response != null && response.body()!= null)
+                restResponse = new StringBuilder(response.body().string());
         } catch (IOException ex) {
-            Logger.getLogger(RestComm.class.getName()).log(Level.SEVERE, null, ex);
+
+            //Logger.getLogger(RestComm.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
@@ -92,7 +95,8 @@ public RestComm(){
         while (restResponse == null && i > 0) {
             i--;
             sleep(1000);
-
+            Log.i(TAG,"wait response countdown");
+            Log.i(TAG,String.valueOf(i));
         }
         return restResponse;
     }
