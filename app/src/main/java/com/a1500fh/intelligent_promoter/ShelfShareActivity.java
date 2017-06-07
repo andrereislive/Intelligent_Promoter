@@ -24,6 +24,9 @@ public class ShelfShareActivity extends AppCompatActivity {
     private ListView lvShare;
     ZoomImageThumb zoom = new ZoomImageThumb();
     ObjectRecoginition imgObjRec;
+    SubProcess mySubProcessThread;
+    CountDown countdown;
+    RestComm rest;
 
     private static String TAG = "ShelfShareActivity";
 
@@ -42,28 +45,43 @@ public class ShelfShareActivity extends AppCompatActivity {
         cleanImage = loadImageTaken(imageSource);
 
         // Inicia thread que faz comunicacao com servidor
-
-
-        SubProcess myThread = new SubProcess(getApplicationContext());
-        myThread.start();
+        mySubProcessThread = new SubProcess(getApplicationContext());
+        mySubProcessThread.start();
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (countdown != null)
+            countdown.stopThread();
+        if (mySubProcessThread != null)
+            mySubProcessThread.stopThread();
+        if(rest != null ){
+            rest.stopProcess();
+        }
+
+    }
 
     private class SubProcess extends Thread {
 
         private Context context;
-
+        private Boolean stop = false;
 
         public SubProcess(Context context) {
             this.context = context;
 
         }
 
+        public void stopThread() {
+            stop = true;
+        }
+
         @Override
         public void run() {
 
-            CountDown countdown = new CountDown(getApplicationContext());
+            countdown = new CountDown(getApplicationContext());
             countdown.start();
             // Envia a imagem para o servidor
             // servidor retorna a imagem processada
@@ -76,17 +94,18 @@ public class ShelfShareActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         List<String> shareList = imgObjRec.getShelfShareObjects();
-                        if (shareList.size() == 0)
-                            MessageUtils.Toast(context,"No Response From Server!",20000);
-                        ArrayAdapter<String> arrayAdapter = new CustomAdapterShare(shareList, context);
+                        if (!stop) {
+                            if (shareList.size() == 0)
+                                MessageUtils.Toast(context, "No Response From Server!", 20000);
+                            ArrayAdapter<String> arrayAdapter = new CustomAdapterShare(shareList, context);
 
-                        lvShare.setAdapter(arrayAdapter);
+                            lvShare.setAdapter(arrayAdapter);
 
-                        if (imgObjRec.getProcessedImage() != null) {
-                            ivShelf.setImageBitmap(imgObjRec.getProcessedImage());
+                            if (imgObjRec.getProcessedImage() != null) {
+                                ivShelf.setImageBitmap(imgObjRec.getProcessedImage());
+                            }
                         }
                     }
-
                 });
             }
         }
@@ -166,7 +185,7 @@ public class ShelfShareActivity extends AppCompatActivity {
      * todos esses dados são serializados no ObjectRecognition que podera ser usado mais afrente
      */
     private ObjectRecoginition sendCleanImageToServer(Bitmap cleanImage) {
-        RestComm rest = new RestComm();
+        rest = new RestComm();
         rest.executeSendImageToServer(cleanImage);
 
         ObjectRecoginition objRec = new ObjectRecoginition(rest.getResponse());

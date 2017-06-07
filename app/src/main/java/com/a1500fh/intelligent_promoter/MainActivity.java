@@ -1,5 +1,6 @@
 package com.a1500fh.intelligent_promoter;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
@@ -18,8 +19,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -41,15 +45,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final int CAPTURE_IMAGE_FULLSIZE_ACTIVITY_REQUEST_CODE = 1777;
 
-    private static final String IMG_PATH_CAMERA = Environment.getExternalStorageDirectory() + File.separator + "image.jpg"; // se capturar da camera entao salva nesta pasta
+    private static String IMG_PATH_CAMERA; // se capturar da camera entao salva nesta pasta
 
-    private String imgPath = IMG_PATH_CAMERA; // caminho da imagem escolhida
+    private String imgPath; // caminho da imagem escolhida
 
     private ImageView ivShelf;
     private ImageButton btnLoadShelf;
     private ImageButton btnListProduct;
     private Bitmap chosenImage;
-
 
 
     private static final int RESULT_LOAD_IMG = 1;
@@ -61,9 +64,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 1);
+            }
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+            }
+            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+            }
+            if (checkSelfPermission(Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET}, 1);
+            }
+            if (checkSelfPermission(Manifest.permission.MANAGE_DOCUMENTS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.MANAGE_DOCUMENTS}, 1);
+            }
+            if (checkSelfPermission(Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_NETWORK_STATE}, 1);
+            }
+
+
+        }
+
+
+
+
+
         setContentView(R.layout.activity_main);
-
-
+        IMG_PATH_CAMERA = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES) + File.separator + "image.jpg";
+        imgPath = IMG_PATH_CAMERA;
         ivShelf = (ImageView) findViewById(R.id.ivShelf);
 
         btnLoadShelf = (ImageButton) findViewById(R.id.btnCamera);
@@ -74,15 +107,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnListProduct.setOnClickListener(this);
 
 
-        // Desebilita camera se dispositivo nao tiver
-        if (!hasCamera())
-            btnLoadShelf.setEnabled(false);
+        Log.i(TAG, imgPath);
 
-        File file = new File(imgPath);
-
-        if (file.exists()) {
-            file.delete();
-        }
     }
 
 
@@ -123,12 +149,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    private boolean hasCamera() {
-        return getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY);
-    }
-
-
     private void selectImage() {
+        Log.i(TAG, "Select Image");
         final CharSequence[] items = {"Camera", "Gallery",
                 "Cancel"};
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -150,11 +172,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void launchCameraFullRes() {
-        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         imgPath = IMG_PATH_CAMERA;
         File file = new File(imgPath);
+
         intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
         startActivityForResult(intent, CAPTURE_IMAGE_FULLSIZE_ACTIVITY_REQUEST_CODE);
+
+
+
     }
 
     private void galleryIntent() {
@@ -173,12 +199,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (requestCode == CAPTURE_IMAGE_FULLSIZE_ACTIVITY_REQUEST_CODE) {
             //Get our saved file into a bitmap object:
             //File file = new File(imgPath);
+
             if (new File(imgPath).exists()) {
+
                 Bitmap bitmap = ImageCapture.rotateBitmapOrientation(imgPath);
                 chosenImage = bitmap;
                 ivShelf.setImageBitmap(chosenImage);
-            }
+            } else {
 
+            }
             return;
         }
 
@@ -187,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 && null != data) {
             // Get the Image from data
             Uri selectedImage = data.getData();
-            imgPath = PathUtil.getRealPathFromURI(this,selectedImage);
+            imgPath = PathUtil.getRealPathFromURI(this, selectedImage);
             Bitmap bm = ImageCapture.rotateBitmapOrientation(imgPath);
 
             chosenImage = bm;
@@ -198,12 +227,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         chosenImage = null;
 
     }
-
-
-
-
-
-
 
 
 }

@@ -23,14 +23,15 @@ public class RestComm extends AsyncTask {
     private static final String TAG = "RestComm";
 
     public static final int SEND_IMAGE_TO_SERVER = 0;
-    public static final String URL_SEND_IMAGE_TO_SERVER = "http://http://13.65.200.246/intelligent_promoter/image/";
+    public static final String URL_SEND_IMAGE_TO_SERVER = "http://13.65.200.246/intelligent_promoter/image/";
 
-    public static final int CONNECTION_LIFE = 60;
+    public static final int CONNECTION_LIFE = 90;
 
     private static final int CONNECTION_TIMEOUT_SEC = CONNECTION_LIFE; // tempo de vida da conexao
     private static final int WRITE_TIMEOUT_SEC = CONNECTION_LIFE;
     private static final int READ_TIMEOUT_SEC = CONNECTION_LIFE; // tempo de vida do socket
 
+    private Boolean stopProcess = false;
 
     StringBuilder restResponse;
 
@@ -92,7 +93,7 @@ public class RestComm extends AsyncTask {
     public StringBuilder getResponse() {
         int i = CONNECTION_TIMEOUT_SEC;
         // espera um tempo pra processar o rest no doInbackground
-        while (restResponse == null && i > 0) {
+        while (restResponse == null && i > 0 && stopProcess == false) {
             i--;
             sleep(1000);
             Log.i(TAG,"wait response countdown");
@@ -101,6 +102,9 @@ public class RestComm extends AsyncTask {
         return restResponse;
     }
 
+    public void stopProcess(){
+        stopProcess = true;
+    }
     /**
      * Cria os parametros que são necessarios para a chamada do metodo execute.
      *
