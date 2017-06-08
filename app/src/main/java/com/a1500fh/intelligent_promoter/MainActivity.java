@@ -20,6 +20,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -38,17 +39,18 @@ import com.a1500fh.utils.PathUtil;
 import com.a1500fh.utils.ZoomImageThumb;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import static com.a1500fh.utils.ImageCapture.scaleBitmapToFitImageView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "MainActivity";
-
     private static final int CAPTURE_IMAGE_FULLSIZE_ACTIVITY_REQUEST_CODE = 1777;
 
-    private static String IMG_PATH_CAMERA; // se capturar da camera entao salva nesta pasta
-
     private String imgPath; // caminho da imagem escolhida
-
     private ImageView ivShelf;
     private ImageButton btnLoadShelf;
     private ImageButton btnListProduct;
@@ -90,24 +92,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
 
-
-
-
         setContentView(R.layout.activity_main);
-        IMG_PATH_CAMERA = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES) + File.separator + "image.jpg";
-        imgPath = IMG_PATH_CAMERA;
-        ivShelf = (ImageView) findViewById(R.id.ivShelf);
 
+        ivShelf = (ImageView) findViewById(R.id.ivShelf);
         btnLoadShelf = (ImageButton) findViewById(R.id.btnCamera);
         btnListProduct = (ImageButton) findViewById(R.id.btnLoad);
 
         btnLoadShelf.setOnClickListener(this);
         ivShelf.setOnClickListener(this);
         btnListProduct.setOnClickListener(this);
-
-
-        Log.i(TAG, imgPath);
 
     }
 
@@ -125,8 +118,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.btnLoad:
-                File file = new File(imgPath);
-                if (file.exists()) {
+
+                if (imgPath != null && new File(imgPath).exists()) {
                     Intent intent = new Intent(this, ShelfShareActivity.class);
                     intent.putExtra("image_source", imgPath);
 
@@ -135,8 +128,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(this, "Please take a photo of the shelf first", Toast.LENGTH_SHORT).show();
                 }
                 break;
-
         }
+
     }
 
 
@@ -160,10 +153,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onClick(DialogInterface dialog, int item) {
 
                 if (items[item].equals("Camera")) {
-                    launchCameraFullRes();
+                    dispatchTakePictureIntentHighQuality();
                 } else if (items[item].equals("Gallery")) {
                     galleryIntent();
                 } else if (items[item].equals("Cancel")) {
+                    cancelImage();
                     dialog.dismiss();
                 }
             }
@@ -171,23 +165,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         builder.show();
     }
 
-    public void launchCameraFullRes() {
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        imgPath = IMG_PATH_CAMERA;
-        File file = new File(imgPath);
+    private void cancelImage() {
+        ivShelf.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.fundo));
 
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
-        startActivityForResult(intent, CAPTURE_IMAGE_FULLSIZE_ACTIVITY_REQUEST_CODE);
-
-
-
+        imgPath = null;
+        chosenImage = null;
     }
+
+
+    /**
+     * Nov metodo para capturar imagens no android 7.0 api 23, tambem funciona com as versoes anteriores
+     */
+    private void dispatchTakePictureIntentHighQuality() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                // set imgPath dentro do createImageFile()
+
+                photoFile = createImageFile();
+                imgPath = photoFile.getAbsolutePath();
+
+                // Continue only if the File was successfully created
+                if (photoFile != null) {
+                    Uri photoURI = FileProvider.getUriForFile(this,
+                            BuildConfig.APPLICATION_ID + ".fileprovider",
+                            photoFile);
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                    startActivityForResult(takePictureIntent, CAPTURE_IMAGE_FULLSIZE_ACTIVITY_REQUEST_CODE);
+                }
+
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+            }
+
+
+        }
+    }
+
 
     private void galleryIntent() {
         // Create intent to Open Image applications like Gallery, Google Photos
         Intent galleryIntent = new Intent(Intent.ACTION_PICK,
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-// Start the Intent
+        // Start the Intent
         startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
     }
 
@@ -196,17 +219,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         //Check that request code matches ours:
-        if (requestCode == CAPTURE_IMAGE_FULLSIZE_ACTIVITY_REQUEST_CODE) {
+        if (requestCode == CAPTURE_IMAGE_FULLSIZE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK ) {
             //Get our saved file into a bitmap object:
             //File file = new File(imgPath);
-
-            if (new File(imgPath).exists()) {
-
+            if ( imgPath != null  && new File(imgPath).exists()) {
                 Bitmap bitmap = ImageCapture.rotateBitmapOrientation(imgPath);
-                chosenImage = bitmap;
-                ivShelf.setImageBitmap(chosenImage);
-            } else {
 
+                chosenImage = bitmap;
+                ivShelf.setImageBitmap(bitmap);
             }
             return;
         }
@@ -217,16 +237,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // Get the Image from data
             Uri selectedImage = data.getData();
             imgPath = PathUtil.getRealPathFromURI(this, selectedImage);
-            Bitmap bm = ImageCapture.rotateBitmapOrientation(imgPath);
+            Bitmap bitmap = ImageCapture.rotateBitmapOrientation(imgPath);
 
-            chosenImage = bm;
-            ivShelf.setImageBitmap(bm);
+            chosenImage = bitmap;
+            bitmap = scaleBitmapToFitImageView(ivShelf.getWidth(), ivShelf.getHeight(), imgPath);
+            ivShelf.setImageBitmap(bitmap);
             return;
         }
-        imgPath = null;
-        chosenImage = null;
+
+        cancelImage();
 
     }
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setMessage("Are you sure you want to exit?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        finish();
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
+    }
 
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+        return image;
+    }
 
 }

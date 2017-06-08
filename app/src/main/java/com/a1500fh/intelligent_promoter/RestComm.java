@@ -25,7 +25,7 @@ public class RestComm extends AsyncTask {
     public static final int SEND_IMAGE_TO_SERVER = 0;
     public static final String URL_SEND_IMAGE_TO_SERVER = "http://13.65.200.246/intelligent_promoter/image/";
 
-    public static final int CONNECTION_LIFE = 90;
+    public static final int CONNECTION_LIFE = 180;
 
     private static final int CONNECTION_TIMEOUT_SEC = CONNECTION_LIFE; // tempo de vida da conexao
     private static final int WRITE_TIMEOUT_SEC = CONNECTION_LIFE;
@@ -72,13 +72,13 @@ public class RestComm extends AsyncTask {
                 .build();
         try {
             Response response = client.newCall(request).execute();
-            if (response != null && response.body()!= null)
+            if (response != null && response.body()!= null){
                 restResponse = new StringBuilder(response.body().string());
-        } catch (IOException ex) {
 
+            }
+        } catch (IOException ex) {
             //Logger.getLogger(RestComm.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
 
 
