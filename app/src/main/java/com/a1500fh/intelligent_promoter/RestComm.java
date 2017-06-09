@@ -23,8 +23,8 @@ public class RestComm extends AsyncTask {
     private static final String TAG = "RestComm";
 
     public static final int SEND_IMAGE_TO_SERVER = 0;
-
     public static final String URL_SERVER = "http://13.65.200.246";
+    //public static final String URL_SERVER = "http://192.168.0.104";
     public static final String URL_SEND_IMAGE_TO_SERVER = URL_SERVER + "/intelligent_promoter/image/";
     private static final String URL_CHECK_SERVER_ONLINE = URL_SERVER + "/online/";
 

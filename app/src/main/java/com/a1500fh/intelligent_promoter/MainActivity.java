@@ -60,8 +60,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int RESULT_LOAD_IMG = 1;
 
     ZoomImageThumb zoom = new ZoomImageThumb();
-// ############ Parei akii ############################
-    // ##################################################
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +86,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_NETWORK_STATE}, 1);
             }
 
-
         }
 
 
@@ -110,26 +107,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
 
             case R.id.ivShelf:
-                if (chosenImage != null)
-                    zoom.zoomImageFromThumb(ivShelf, chosenImage, (ImageView) findViewById(R.id.expanded_image), R.id.container, this);
+                if (chosenImage != null) {
+                    // da um zoom na imagem quando clica no imageView
+                    ImageView ivExpanded =  (ImageView) findViewById(R.id.expanded_image);
+                    Bitmap bitmap = scaleBitmapToFitImageView(ivExpanded.getWidth(), ivExpanded.getHeight(), imgPath);
+                    zoom.zoomImageFromThumb(ivShelf, bitmap,ivExpanded, R.id.container, this);
+                }
                 break;
             case R.id.btnCamera:
                 selectImage();
                 break;
 
             case R.id.btnLoad:
-
                 if (imgPath != null && new File(imgPath).exists()) {
                     Intent intent = new Intent(this, ShelfShareActivity.class);
                     intent.putExtra("image_source", imgPath);
-
                     startActivity(intent);
                 } else {
                     Toast.makeText(this, "Please take a photo of the shelf first", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
-
     }
 
 
@@ -137,7 +135,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
         if (chosenImage != null) {
-            ivShelf.setImageBitmap(chosenImage);
+            Bitmap bitmap = scaleBitmapToFitImageView(ivShelf.getWidth(), ivShelf.getHeight(), imgPath);
+            ivShelf.setImageBitmap(bitmap);
         }
     }
 
@@ -184,7 +183,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             File photoFile = null;
             try {
                 // set imgPath dentro do createImageFile()
-
                 photoFile = createImageFile();
                 imgPath = photoFile.getAbsolutePath();
 
@@ -219,13 +217,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         //Check that request code matches ours:
-        if (requestCode == CAPTURE_IMAGE_FULLSIZE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK ) {
+        if (requestCode == CAPTURE_IMAGE_FULLSIZE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
             //Get our saved file into a bitmap object:
             //File file = new File(imgPath);
-            if ( imgPath != null  && new File(imgPath).exists()) {
+            if (imgPath != null && new File(imgPath).exists()) {
                 Bitmap bitmap = ImageCapture.rotateBitmapOrientation(imgPath);
 
                 chosenImage = bitmap;
+                bitmap = scaleBitmapToFitImageView(ivShelf.getWidth(), ivShelf.getHeight(), imgPath);
                 ivShelf.setImageBitmap(bitmap);
             }
             return;
@@ -248,6 +247,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         cancelImage();
 
     }
+
     @Override
     public void onBackPressed() {
         new AlertDialog.Builder(this)

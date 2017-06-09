@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -18,6 +19,8 @@ import com.a1500fh.utils.ZoomImageThumb;
 import java.io.File;
 import java.util.List;
 
+import static com.a1500fh.utils.ImageCapture.scaleBitmapToFitImageView;
+
 public class ShelfShareActivity extends AppCompatActivity {
     private Bitmap cleanImage;
     private ImageView ivShelf;
@@ -28,8 +31,10 @@ public class ShelfShareActivity extends AppCompatActivity {
     CountDown countdown;
     RestComm rest;
 
+
     private static String TAG = "ShelfShareActivity";
-    private boolean processFinished = false;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,8 +70,7 @@ public class ShelfShareActivity extends AppCompatActivity {
         if (rest != null) {
             rest.stopProcess();
         }
-        if(!processFinished)
-            MessageUtils.Toast(getApplicationContext(), "Canceled by User!", 20000);
+
 
     }
 
@@ -153,7 +157,7 @@ public class ShelfShareActivity extends AppCompatActivity {
                 imgObjRec = sendCleanImageToServer(cleanImage);
                 countdown.stopThread();
 
-                processFinished = true;
+
                 if (imgObjRec != null) {
 
                     switch (imgObjRec.getStatus()) {
@@ -259,8 +263,11 @@ public class ShelfShareActivity extends AppCompatActivity {
     public void btnIvClick(View v) {
         switch (v.getId()) {
             case R.id.ivRecognition:
-                if (imgObjRec != null && imgObjRec.getProcessedImage() != null)
-                    zoom.zoomImageFromThumb(ivShelf, imgObjRec.getProcessedImage(), (ImageView) findViewById(R.id.expanded_image_share), R.id.container_share, this);
+                if (imgObjRec != null && imgObjRec.getProcessedImage() != null) {
+                    ImageView ivExpanded = (ImageView) findViewById(R.id.expanded_image_share);
+
+                    zoom.zoomImageFromThumb(ivShelf, imgObjRec.getProcessedImage(), ivExpanded, R.id.container_share, this);
+                }
                 break;
         }
     }
@@ -270,7 +277,11 @@ public class ShelfShareActivity extends AppCompatActivity {
         Bitmap bitmap = null;
         File fileCheck = new File(imageSource);
         if (fileCheck.exists()) {
-            bitmap = ImageCapture.rotateBitmapOrientation(imageSource);
+            int width = ImageCapture.getScreenWidth(getWindowManager());
+            int height = ImageCapture.getScreenHeight(getWindowManager());
+            // diminui a resolucao da imagem para evitar problemas de estouro da memoria heap
+            Bitmap bitmapScaled = scaleBitmapToFitImageView(width, height, imageSource);
+            bitmap = ImageCapture.rotateBitmapOrientation(bitmapScaled, imageSource);
         } else {
             Toast.makeText(this, "Image not found!", Toast.LENGTH_SHORT).show();
         }

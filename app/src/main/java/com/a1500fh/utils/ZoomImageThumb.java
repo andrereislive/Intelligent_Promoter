@@ -82,7 +82,7 @@ public class ZoomImageThumb {
         final Point globalOffset = new Point();
 
         thumbView.getGlobalVisibleRect(startBounds);
-        appCompatActivity.findViewById(rIdContainer) // possivel erro <<<<<<<<<<<<<
+        appCompatActivity.findViewById(rIdContainer)
                 .getGlobalVisibleRect(finalBounds, globalOffset);
         startBounds.offset(-globalOffset.x, -globalOffset.y);
         finalBounds.offset(-globalOffset.x, -globalOffset.y);

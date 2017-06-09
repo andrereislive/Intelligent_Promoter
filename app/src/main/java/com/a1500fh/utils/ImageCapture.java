@@ -3,8 +3,11 @@ package com.a1500fh.utils;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.Point;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.view.Display;
+import android.view.WindowManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +29,7 @@ public class ImageCapture {
      * @return imagem em Bitmap
      */
     public static Bitmap rotateBitmapOrientation(String file) {
+
 
         // Create and configure BitmapFactory
         BitmapFactory.Options bounds = new BitmapFactory.Options();
@@ -55,14 +59,44 @@ public class ImageCapture {
         return rotatedBitmap;
     }
 
+
+    public static Bitmap rotateBitmapOrientation(Bitmap imageBitmap, String imgPath) {
+
+
+        // Create and configure BitmapFactory
+        BitmapFactory.Options bounds = new BitmapFactory.Options();
+        bounds.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(imgPath, bounds);
+        BitmapFactory.Options opts = new BitmapFactory.Options();
+
+        // Read EXIF Data
+        ExifInterface exif = null;
+        try {
+            exif = new ExifInterface(imgPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String orientString = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
+        int orientation = orientString != null ? Integer.parseInt(orientString) : ExifInterface.ORIENTATION_NORMAL;
+        int rotationAngle = 0;
+        if (orientation == ExifInterface.ORIENTATION_ROTATE_90) rotationAngle = 90;
+        if (orientation == ExifInterface.ORIENTATION_ROTATE_180) rotationAngle = 180;
+        if (orientation == ExifInterface.ORIENTATION_ROTATE_270) rotationAngle = 270;
+        // Rotate Bitmap
+        Matrix matrix = new Matrix();
+
+        matrix.setRotate(rotationAngle, (float) imageBitmap.getWidth() / 2, (float) imageBitmap.getHeight() / 2);
+        Bitmap rotatedBitmap = Bitmap.createBitmap(imageBitmap, 0, 0, imageBitmap.getWidth(), imageBitmap.getHeight(), matrix, true);
+        // Return result
+        return rotatedBitmap;
+    }
+
     /**
      *  Recebe uma imagem e o tamanho de um imageView, o codigo re-escala a imagem para caber no imageView,
      *  a diferen;a entre somente jogar a imagem no IV e re-escalar é que ocupa menos memoria,
      *  isso pode ser um problema quanto ao uso em dispositivos com memoria ram limitada
      * @return
      */
-
-
     public static Bitmap scaleBitmapToFitImageView(int imageViewWidth, int imageViewHeight, String imagePath) {
         // Get the dimensions of the View
         int targetW = imageViewWidth;
@@ -88,6 +122,18 @@ public class ImageCapture {
     }
 
 
+    public static int getScreenWidth(WindowManager windowManager ){
+        Display display = windowManager.getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        return  size.x;
+    }
+    public static int getScreenHeight(WindowManager windowManager ){
+        Display display = windowManager.getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        return  size.y;
+    }
 
 
 }

@@ -162,7 +162,6 @@ public class ObjectRecoginition {
 
         String imageUuidName = UUID.randomUUID().toString();
 
-
         String myJson = "{\"" + strCleanImage + "\":\"" + encodedImage + "\",\"" + strCleanImageUuidName + "\":\"" + imageUuidName + "\"}";
 
 
