@@ -37,6 +37,11 @@ public class ObjectRecoginition {
     private static final String strCleanImage = "clean_image";
     private static final String strProcessedImage = "processed_image";
     private static final String strCleanImageUuidName = "clean_image_uuid_name";
+    // se recebeu uma resposta valida de acordo com as keys strCleanImage, strProcessedImage e strShelfShareArray
+    // entao validServerResponse deve ser setado com essa variavel
+    public static final int RECEIVED_VALID_SERVER_RESPONSE = 2;
+    public static final int ERROR_SERVER_RESPONSE = 1;
+    public static final int NO_RESPONSE_FROM_SERVER = 0;
 
 
     private List<RecognizedObjects> recognizedObjectsList = new ArrayList<>();
@@ -44,6 +49,7 @@ public class ObjectRecoginition {
 
     private Bitmap processedImage;
     private Bitmap cleanImage;
+    private int validServerResponse = ERROR_SERVER_RESPONSE;
 
     public ObjectRecoginition() {
 
@@ -55,29 +61,59 @@ public class ObjectRecoginition {
             if (myJsonString != null) {
                 // create the data structure to exploit the content
                 // the string is created assuming default encoding
+
+
                 JSONObject jsono = new JSONObject(myJsonString.toString());
-                String processed = jsono.get(strProcessedImage).toString();
-                String clean = jsono.get(strCleanImage).toString();
 
-                processedImage = string64toBitmap(processed);
-                setCleanImage(string64toBitmap(clean));
+                if (validadeJSonObj(jsono)) {
+                    String processed = jsono.get(strProcessedImage).toString();
+                    String clean = jsono.get(strCleanImage).toString();
+
+                    processedImage = string64toBitmap(processed);
+                    setCleanImage(string64toBitmap(clean));
+
+                    JSONArray jArrayRecognizedObjects;
+                    if(!jsono.isNull(strRecognizedObjectsArray)){
+                        jArrayRecognizedObjects = jsono.getJSONArray(strRecognizedObjectsArray);
+                        for (int x = 0; x < jArrayRecognizedObjects.length(); x++) {
+                            recognizedObjectsList.add(new RecognizedObjects(jArrayRecognizedObjects.getJSONObject(x)));
+                        }
+                    }
 
 
-                JSONArray jArrayRecognizedObjects = jsono.getJSONArray(strRecognizedObjectsArray);
-                for (int x = 0; x < jArrayRecognizedObjects.length(); x++) {
-                    recognizedObjectsList.add(new RecognizedObjects(jArrayRecognizedObjects.getJSONObject(x)));
-                }
+                    JSONArray jArrayShare;
+                    if (!jsono.isNull(strShelfShareArray)) {
+                        jArrayShare = jsono.getJSONArray(strShelfShareArray);
 
-                JSONArray jArrayShare = jsono.getJSONArray(strShelfShareArray);
-                for (int x = 0; x < jArrayShare.length(); x++) {
-                    shelfShareList.add(new ShelfShare(jArrayShare.getJSONObject(x)));
-                }
+                        for (int x = 0; x < jArrayShare.length(); x++) {
+                            shelfShareList.add(new ShelfShare(jArrayShare.getJSONObject(x)));
+                        }
+                    }
 
+                    validServerResponse = RECEIVED_VALID_SERVER_RESPONSE;
+                } else
+                    validServerResponse = ERROR_SERVER_RESPONSE;
+            } else {
+                validServerResponse = NO_RESPONSE_FROM_SERVER;
             }
         } catch (JSONException e) {
+            validServerResponse = ERROR_SERVER_RESPONSE;
             e.printStackTrace();
         }
 
+    }
+
+    private boolean validadeJSonObj(JSONObject json) {
+        if (!json.has(strCleanImage))
+            return false;
+        if (!json.has(strProcessedImage))
+            return false;
+        if (!json.has(strRecognizedObjectsArray))
+            return false;
+        if (!json.has(strShelfShareArray))
+            return false;
+
+        return true;
     }
 
 
@@ -141,6 +177,11 @@ public class ObjectRecoginition {
 
         }
         return shareList;
+    }
+
+    public int getStatus() {
+
+        return validServerResponse;
     }
 
     public class ShelfShare {

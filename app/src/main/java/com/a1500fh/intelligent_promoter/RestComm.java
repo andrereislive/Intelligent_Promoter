@@ -23,13 +23,21 @@ public class RestComm extends AsyncTask {
     private static final String TAG = "RestComm";
 
     public static final int SEND_IMAGE_TO_SERVER = 0;
-    public static final String URL_SEND_IMAGE_TO_SERVER = "http://13.65.200.246/intelligent_promoter/image/";
+
+    public static final String URL_SERVER = "http://13.65.200.246";
+    public static final String URL_SEND_IMAGE_TO_SERVER = URL_SERVER + "/intelligent_promoter/image/";
+    private static final String URL_CHECK_SERVER_ONLINE = URL_SERVER + "/online/";
+
+    public static final int SERVER_ONLINE = 2;
+    public static final int SERVER_OFFLINE = 1;
+    public static final int SERVER_ERROR = 0;
+
 
     public static final int CONNECTION_LIFE = 180;
-
     private static final int CONNECTION_TIMEOUT_SEC = CONNECTION_LIFE; // tempo de vida da conexao
     private static final int WRITE_TIMEOUT_SEC = CONNECTION_LIFE;
     private static final int READ_TIMEOUT_SEC = CONNECTION_LIFE; // tempo de vida do socket
+
 
     private Boolean stopProcess = false;
 
@@ -72,7 +80,7 @@ public class RestComm extends AsyncTask {
                 .build();
         try {
             Response response = client.newCall(request).execute();
-            if (response != null && response.body()!= null){
+            if (response != null && response.body() != null) {
                 restResponse = new StringBuilder(response.body().string());
 
             }
@@ -96,15 +104,16 @@ public class RestComm extends AsyncTask {
         while (restResponse == null && i > 0 && stopProcess == false) {
             i--;
             sleep(1000);
-            Log.i(TAG,"wait response countdown");
-            Log.i(TAG,String.valueOf(i));
+            Log.i(TAG, "wait response countdown");
+            Log.i(TAG, String.valueOf(i));
         }
         return restResponse;
     }
 
-    public void stopProcess(){
+    public void stopProcess() {
         stopProcess = true;
     }
+
     /**
      * Cria os parametros que são necessarios para a chamada do metodo execute.
      *
@@ -118,5 +127,47 @@ public class RestComm extends AsyncTask {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public int isServerOnline() {
+        int responseInt = SERVER_OFFLINE;
+
+        client = new OkHttpClient.Builder()
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(10, TimeUnit.SECONDS)
+                .build();
+
+        Request request = new Request.Builder()
+                .url(URL_CHECK_SERVER_ONLINE)
+                .get()
+                .build();
+        try {
+            Response response = client.newCall(request).execute();
+            if (response != null && response.body() != null) {
+                int x = response.code();
+
+                switch (x) {
+                    case 200:
+                        responseInt = SERVER_ONLINE;
+                        break;
+                    case 404:
+                        responseInt = SERVER_ERROR;
+                        break;
+                    default:
+                        responseInt = SERVER_OFFLINE;
+                        break;
+                }
+
+            } else {
+                responseInt = SERVER_OFFLINE;
+            }
+        } catch (IOException ex) {
+
+            responseInt = SERVER_OFFLINE;
+        }
+
+        return responseInt;
+
     }
 }
