@@ -109,9 +109,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.ivShelf:
                 if (chosenImage != null) {
                     // da um zoom na imagem quando clica no imageView
-                    ImageView ivExpanded =  (ImageView) findViewById(R.id.expanded_image);
+                    ImageView ivExpanded = (ImageView) findViewById(R.id.expanded_image);
                     Bitmap bitmap = scaleBitmapToFitImageView(ivExpanded.getWidth(), ivExpanded.getHeight(), imgPath);
-                    zoom.zoomImageFromThumb(ivShelf, bitmap,ivExpanded, R.id.container, this);
+                    zoom.zoomImageFromThumb(ivShelf, bitmap, ivExpanded, R.id.container, this);
                 }
                 break;
             case R.id.btnCamera:
@@ -235,12 +235,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 && null != data) {
             // Get the Image from data
             Uri selectedImage = data.getData();
-            imgPath = PathUtil.getRealPathFromURI(this, selectedImage);
-            Bitmap bitmap = ImageCapture.rotateBitmapOrientation(imgPath);
+            if (selectedImage != null) {
+                imgPath = PathUtil.getRealPathFromURI(this, selectedImage);
+                Bitmap bitmap = ImageCapture.rotateBitmapOrientation(imgPath);
 
-            chosenImage = bitmap;
-            bitmap = scaleBitmapToFitImageView(ivShelf.getWidth(), ivShelf.getHeight(), imgPath);
-            ivShelf.setImageBitmap(bitmap);
+                chosenImage = bitmap;
+                bitmap = scaleBitmapToFitImageView(ivShelf.getWidth(), ivShelf.getHeight(), imgPath);
+                ivShelf.setImageBitmap(bitmap);
+            }
             return;
         }
 
@@ -256,10 +258,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         finish();
+                        System.exit(0);
                     }
                 })
                 .setNegativeButton("No", null)
                 .show();
+
+
     }
 
     private File createImageFile() throws IOException {
